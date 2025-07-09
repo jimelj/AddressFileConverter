@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import cbaLogo from './cba-logo.svg';
 
 function App() {
   const [file, setFile] = useState(null);
@@ -86,8 +87,14 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-                 <h1>📊 CSV to TXT Converter</h1>
-         <p>Upload your CSV file and convert it to a formatted text file</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+          <img src={cbaLogo} alt="CBA Logo" style={{ height: '2.5rem' }} />
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+            CSV to TXT Converter
+            <span role="img" aria-label="bar chart">📊</span>
+          </h1>
+        </div>
+        <p>Upload your CSV file and convert it to a formatted text file</p>
       </header>
 
       <main className="App-main">
