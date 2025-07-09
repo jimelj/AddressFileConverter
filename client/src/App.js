@@ -143,7 +143,7 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {parsedPreview.rows.slice(0, 10).map((row, rowIndex) => (
+                    {parsedPreview.rows.slice(0, 200).map((row, rowIndex) => (
                       <tr key={rowIndex}>
                         {row.map((cell, cellIndex) => (
                           <td key={cellIndex}>{cell}</td>
