@@ -110,14 +110,27 @@ const HEADER_MAP = {
   // All other fields will be left empty
 };
 
+function splitAddress(address) {
+  if (!address) return { street: '', secondary: '' };
+  // Regex to match unit designators (case-insensitive)
+  const regex = /\b(APT|STE|FL|UNIT)\b/i;
+  const match = address.match(regex);
+  if (match) {
+    const idx = match.index;
+    return {
+      street: address.substring(0, idx).trim(),
+      secondary: address.substring(idx).trim()
+    };
+  } else {
+    return { street: address, secondary: '' };
+  }
+}
+
 function convertToTextFormat(data) {
   if (!data || data.length === 0) return '';
 
-  // The first row of data is the uploaded CSV's header
   const uploadedHeader = data[0] || [];
   const rows = data.slice(1) || [];
-
-  // Map uploaded header fields to their indices (case-insensitive, trimmed)
   const headerIndexMap = {};
   uploadedHeader.forEach((h, i) => {
     if (h) headerIndexMap[h.trim().toLowerCase()] = i;
@@ -135,20 +148,24 @@ function convertToTextFormat(data) {
   });
 
   let textContent = '';
-
-  // Add canonical header (always quoted)
   const formattedHeaders = CANONICAL_HEADER.map(header => `"${header}"`).join(',');
   textContent += formattedHeaders + '\n';
 
-  // For each row, map values to canonical header order using HEADER_MAP
   rows.forEach(row => {
     const formattedRow = CANONICAL_HEADER.map(header => {
+      if (header === 'Street Address' || header === 'Secondary Ad') {
+        const idx = headerIndexMap['addressl'];
+        const address = idx !== undefined ? row[idx] : '';
+        const split = splitAddress(address);
+        if (header === 'Street Address') return `"${split.street}"`;
+        if (header === 'Secondary Ad') return `"${split.secondary}"`;
+      }
       const csvCol = HEADER_MAP[header];
-      if (!csvCol) return '""'; // Always output quoted empty string for unmapped columns
+      if (!csvCol) return '""';
       const idx = headerIndexMap[csvCol.trim().toLowerCase()];
       const cell = idx !== undefined ? row[idx] : '';
       if (cell === undefined || cell === null || cell === '') {
-        return '""'; // Always output quoted empty string for empty values
+        return '""';
       } else {
         return `"${cell.toString().replace(/"/g, '""') }"`;
       }
